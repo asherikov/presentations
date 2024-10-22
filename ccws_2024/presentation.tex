@@ -1,0 +1,786 @@
+\documentclass[hyperref={colorlinks=false, breaklinks=true},11pt]{beamer}
+%\usepackage[utf-8]{inputenc}
+%\usepackage[english,russian]{babel}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{listings}
+\usepackage{latexsym}
+\usepackage{psfrag}
+\usepackage{helvet}
+\usepackage{url}
+
+%\usetheme{default}
+%\usefonttheme{structurebold}
+%\usefonttheme{structureitalicserif}
+\useinnertheme{circles}
+\useoutertheme{infolines}
+%\usecolortheme{orchid}
+\usecolortheme{seagull}
+\setbeamertemplate{navigation symbols}{}
+%\setbeamertemplate{navigation symbols}{\insertslidenavigationsymbol}
+\usefonttheme[onlymath]{serif}
+\setbeamertemplate{blocks}[rounded][shadow=false]
+
+\AtBeginDocument{
+    \setlength\abovedisplayskip{0pt}
+    \setlength\abovedisplayshortskip{0pt}
+    \setlength\belowdisplayskip{0pt}
+    \setlength\belowdisplayshortskip{0pt}
+}
+
+\setbeamercolor{title}{bg=black!20}
+\setbeamercolor{description item}{fg=black}
+\setbeamercolor{title in head/foot}{bg=black!30}
+\setbeamercolor{subtitle in head/foot}{bg=gray}
+\setbeamercolor{date in head/foot}{bg=black!20}
+
+%\newcommand \thesectionroman {\@Roman\c@section}
+\setbeamertemplate{footline}
+{%
+    \leavevmode%
+    \hbox{%
+        \begin{beamercolorbox}[wd=.46\paperwidth,ht=2.25ex,dp=1ex,right]{title in head/foot}%
+        \usebeamerfont{section in head/foot}\Roman{section}\hspace*{2ex}\insertsectionhead\hspace*{2ex}
+        \end{beamercolorbox}%
+        \begin{beamercolorbox}[wd=.46\paperwidth,ht=2.25ex,dp=1ex,left]{subtitle in head/foot}%
+        \usebeamerfont{section in head/foot}\hspace*{2ex}\insertsubsectionhead
+        \end{beamercolorbox}%
+        \begin{beamercolorbox}[wd=.08\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
+            \insertframenumber{} / \inserttotalframenumber\hspace*{2ex}
+        \end{beamercolorbox}
+    }
+    \vskip0pt%
+}
+
+\setbeamertemplate{headline}
+{
+%    \leavevmode%
+%    \hbox{%
+%    \begin{beamercolorbox}[wd=1.0\paperwidth,ht=2.25ex,dp=1ex,right]{section in head/foot}%
+%%        \usebeamerfont{section in head/foot}\insertsectionhead\hspace*{2ex}
+%    \end{beamercolorbox}%
+%%  \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.25ex,dp=1ex,left]{subsection in head/foot}%
+%%    \usebeamerfont{subsection in head/foot}\hspace*{2ex}\insertsubsectionhead
+%%  \end{beamercolorbox}%
+%    }
+%    \vskip0pt%
+}
+
+\setbeamertemplate{section in toc shaded}[default][40]
+
+%\AtBeginSection[]
+%{
+%  \begin{frame}<beamer>{Outline}
+%    \tableofcontents[currentsection]
+%  \end{frame}
+%}
+
+
+
+\title{CCWS framework}
+\author{Alexander Sherikov}
+\date{2024}
+
+
+\begin{document}
+%\begin{frame}[plain]
+\begin{frame}[plain,noframenumbering]
+    \titlepage
+\end{frame}
+
+\begin{frame}[plain,noframenumbering]
+    \frametitle{Outline}
+    \begin{columns}[T]
+        \begin{column}{.8\textwidth}
+            \tableofcontents
+        \end{column}
+    \end{columns}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+
+\subsection{What is CCWS?}
+\begin{frame}
+    \frametitle{Overview}
+
+    \center{\url{https://github.com/asherikov/ccws}}
+
+    \begin{block}{Development environment}
+        \begin{itemize}
+            \item[] Scope
+                \begin{itemize}
+                    \item package collections (workspaces, stacks)
+                \end{itemize}
+
+            \item[] Features
+                \begin{itemize}
+                    \item installation of build and package dependencies
+                    \item (cross-)compilation
+                    \item testing
+                    \item static analysis
+                    \item documentation generation
+                    \item binary package generation
+                \end{itemize}
+
+            \item[] Usage
+                \begin{itemize}
+                    \item command line interface
+                    \item suitable for CI automation
+                \end{itemize}
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+
+\subsection{Background and motivation}
+
+\begin{frame}
+    \frametitle{What about ROS?}
+
+    \begin{block}{ROS ecosystem}
+        \begin{itemize}
+            \item focus on individual packages (Lego blocks)
+            \item deployments happen ``later''
+        \end{itemize}
+    \end{block}
+
+    \center{\Large{vs.}}
+
+    \begin{block}{Industrial applications}
+        \begin{itemize}
+            \item system-focused: individual packages is micromanagement
+            \item fast/parallel deployments needed for tests
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Buildfarm sketch}
+
+    \center{\scriptsize{\url{https://docs.ros.org/en/rolling/The-ROS2-Project/Contributing/Build-Farms.html}}}
+
+    \center{\includegraphics[scale=0.45]{buildfarm.eps}}
+
+    \begin{block}{}
+        \begin{itemize}
+            \item everything is package
+            \item devel / release jobs
+            \item rebuilds of dependent packages
+            \item tags, changelogs, release repositories
+            \item stable / staging packages
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Quick deployments}
+
+    \center{\includegraphics[scale=0.45]{quickie.eps}}
+
+    \begin{block}{}
+        \begin{itemize}
+            \item copy install workspaces
+                \begin{itemize}
+                    \item \texttt{scp}, source shell setup scripts
+                    \item \texttt{docker} containers
+                \end{itemize}
+            \item data leaks, fragile
+            \item target architecture may be different
+            \item usually combined with buildfarm
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Workspaces}
+
+    \center{\scriptsize{\url{https://colcon.readthedocs.io/en/released/user/what-is-a-workspace.html}}}
+
+    \begin{block}{Source space}
+        \begin{itemize}
+            \item repository list and sources
+\begin{verbatim}
+repositories:
+    intrometry:
+        type: git
+        url: https://github.com/asherikov/intrometry.git
+        version: main
+...
+\end{verbatim}
+        \end{itemize}
+    \end{block}
+
+    \begin{block}{Build space}
+        \begin{itemize}
+            \item \texttt{cmake} build directories
+        \end{itemize}
+    \end{block}
+
+    \begin{block}{Install space}
+        \begin{itemize}
+            \item installation root directory
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Workspace usage scenarios}
+
+    \begin{block}{Sliding window}
+        \begin{itemize}
+            \item subset of stack packages
+            \item the rest via binary packages
+            \item implement feature, merge, throw away
+            \item \texttt{vcstool} approach
+        \end{itemize}
+    \end{block}
+
+    \begin{block}{Persistent}
+        \begin{itemize}
+            \item same set of packages (possibly all)
+            \item fork source space, implement feature, merge
+            \item lower entry barrier
+            \item more suitable for industrial applications (system focus)
+            \item \texttt{wstool} (deprecated) and \texttt{wshandler} approach
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{\texttt{wshandler status}}
+\footnotesize{%
+\begin{verbatim}
+>>> wshandler status .../ccws/src/: git sources ---
+Flags: H - version hash mismatch, M - uncommited changes
+name              version  actual version              HM repository
+----              -------  --------------              -- ----------
+ariles            pkg_ws_2 tags/ws-2.3.1-0-ge2748ad4      https://git
+intrometry        main     tags/0.1.0-0-ga033cd5-dirty  M https://git
+thread_supervisor master   tags/1.1.0-0-gbbf8a09          https://git
+
+<<< wshandler status .../ccws/src/: git sources ---
+\end{verbatim}
+}
+\end{frame}
+
+\begin{frame}
+    \frametitle{CCWS approach}
+
+    \begin{block}{Principles}
+        \begin{itemize}
+            \item system-focus
+            \item CI independent
+            \item interactive
+            \item facilitate quick deployments
+        \end{itemize}
+    \end{block}
+
+    \begin{block}{Note on packages}
+        \begin{itemize}
+            \item packages -- fine-tuning via fragmentation
+            \item nodes/services -- safety via process isolation
+            \item shift complexity to dependency management tools (vs. \texttt{cmake})
+            \item uniform approach to all components
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Historical overview}
+
+    \begin{block}{}
+        \begin{itemize}
+            \item \texttt{catkin\_tools} helpers
+            \item copy install workspace to deploy target
+            \item run static checks and tests locally
+            \item generate documentation
+            \item \texttt{cmake} toolchains
+            \item pack install workspace to a binary package
+            \item migration to \texttt{colcon}
+            \item cross-compilation
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Implementation}
+
+\begin{frame}
+    \frametitle{Under the hood}
+
+    \begin{block}{Implementation}
+        \begin{itemize}
+            \item[] \texttt{make}
+            \item[] \texttt{bash}
+        \end{itemize}
+    \end{block}
+
+    \begin{block}{3rd party tools}
+        \begin{itemize}
+            \item[] \texttt{colcon}
+            \item[] \texttt{rosdep}
+            \item[] \url{https://github.com/asherikov/wshandler} (not \texttt{vcstool})
+            \item[] \texttt{cmake}, \texttt{ccache}
+            \item[] \texttt{proot}, \texttt{qemu}
+            \item[] system utils: \texttt{mount}, \texttt{losetup}, \texttt{sed}, ...
+            \item[] compilers, linters, \texttt{doxygen}
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Profiles}
+
+    \begin{block}{Build}
+        \begin{description}
+            \item[\it{required:}] shell setup script
+            \item[\it{optional:}] \texttt{cmake} toolchain
+            \item[\it{optional:}] \texttt{Makefile} targets: dependencies, building
+        \end{description}
+    \end{block}
+
+    \begin{block}{Execution}
+        \begin{description}
+            \item[\it{required:}] shell setup script
+                \begin{itemize}
+                    \item generic alternative to catkin hooks
+                \end{itemize}
+            \item[\it{optional:}] \texttt{Makefile} targets: dependencies, building
+        \end{description}
+    \end{block}
+\end{frame}
+
+
+\begin{frame}
+    \frametitle{Directory layout}
+
+    \begin{block}{\texttt{<CCWS root>}}
+        \begin{itemize}
+            \item[] \texttt{setup.bash}
+            \item[] \texttt{Makefile}
+            \item[] \texttt{ccws}
+                \begin{itemize}
+                    \item[] \texttt{profiles}
+                    \item[] \texttt{examples}
+                \end{itemize}
+        \end{itemize}
+    \end{block}
+
+    \begin{block}{\texttt{<workspace root> = [<CCWS root>]}}
+        \begin{itemize}
+            \item[] \texttt{src}
+                \begin{itemize}
+                    \item[] \texttt{.ccws}
+                \end{itemize}
+            \item[] \texttt{install/<build profile>}
+            \item[] \texttt{artifacts/<build profile>}
+            \item[] \texttt{build/<build profile>}
+        \end{itemize}
+    \end{block}
+
+    \begin{block}{\texttt{<cache> = [\$XDG\_CACHE\_HOME]}}
+        \begin{itemize}
+            \item[] \texttt{ccache}
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Distributed profiles}
+
+    \begin{columns}[T]
+    \begin{column}{.49\textwidth}
+        \begin{block}{Build}
+            \begin{itemize}
+                \item \texttt{reldebug} (\texttt{RelWithDebInfo})
+                \item \texttt{scan\_build}: \texttt{clang} + \texttt{scan\_build} + \texttt{clang-tidy}.
+                \item \texttt{thread\_sanitizer}
+                \item \texttt{addr\_undef\_sanitizers}
+                \item \texttt{static\_checks}
+                \item \texttt{doxygen}
+                \item \texttt{cross\_raspberry\_pi}
+                \item \texttt{clangd}
+                \item \texttt{deb}
+            \end{itemize}
+        \end{block}
+    \end{column}
+    \begin{column}{.49\textwidth}
+        \begin{block}{Execution}
+            \begin{itemize}
+                \item \texttt{common} -- a set of common ROS parameters
+                \item \texttt{test}
+                \item \texttt{valgrind}
+                \item \texttt{core\_pattern}
+                \item \texttt{address\_sanitizer}
+            \end{itemize}
+        \end{block}
+    \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Customization}
+
+    \begin{block}{Global}
+        \begin{itemize}
+            \item vendor name, paths, default profiles
+        \end{itemize}
+    \end{block}
+
+    \begin{block}{Profile}
+        \begin{itemize}
+            \item custom profiles
+            \item chaining: simple inheritance
+        \end{itemize}
+    \end{block}
+
+    \begin{block}{Workspace (source space)}
+        \begin{itemize}
+            \item \texttt{cmake} toolchains
+            \item static check exceptions
+            \item \texttt{Dockerfile}
+            \item package selections
+        \end{itemize}
+    \end{block}
+
+    \begin{block}{Package}
+        \begin{itemize}
+            \item \texttt{CCWS} flags and defines
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Artifacts}
+
+    \begin{block}{Artifacts}
+        \begin{itemize}
+            \item build outputs
+                \begin{itemize}
+                    \item debian packages
+                    \item doxygen documentation
+                \end{itemize}
+            \item run outputs
+                \begin{itemize}
+                    \item core files
+                    \item test results
+                    \item logs
+                \end{itemize}
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Usage}
+
+\begin{frame}[fragile]
+    \frametitle{Usage}
+\begin{block}{}
+// install \texttt{CCWS} dependencies
+\begin{verbatim}
+    make bp_install_build BUILD_PROFILE=reldebug
+\end{verbatim}
+\end{block}
+
+\begin{block}{}
+// setup repositories
+\begin{verbatim}
+    nvim ./src/.repos
+    make wsupdate
+\end{verbatim}
+\end{block}
+
+\begin{block}{}
+// install package dependencies
+\begin{verbatim}
+    make dep_install PKG=<MY_PACKAGE>
+\end{verbatim}
+\end{block}
+
+\begin{block}{}
+// build and test
+\begin{verbatim}
+    make <MY_PACKAGE>
+    make test_with_deps PKG=<MY_PACKAGE>
+\end{verbatim}
+\end{block}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Binary packages}
+
+\begin{frame}{Binary packages}
+    \begin{block}{Profiles}
+        \begin{itemize}
+            \item \texttt{deb} profile chains with others
+                \begin{itemize}
+                    \item debug / release versions
+                    \item cross-compilation
+                \end{itemize}
+        \end{itemize}
+    \end{block}
+
+    \begin{block}{``Superpackages''}
+        \begin{itemize}
+            \item workspace in a single binary package
+            \item all dependencies are resolved and added
+            \item simple copy and install
+            \item name and path versioning for parallel installation
+            \item containerization agnostic
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\begin{frame}{Debian packages}
+
+    \begin{block}{Pre-install checks}
+        \begin{itemize}
+            \item system version \texttt{os-release}
+            \item conflicts
+        \end{itemize}
+    \end{block}
+
+    \begin{block}{System configuration}
+        \begin{itemize}
+            \item \texttt{systemd} services and units
+            \item configuration files
+            \item udev rules
+            \item ssh keys
+            \item installation must be optional
+        \end{itemize}
+    \end{block}
+
+    \begin{block}{Simulation packages}
+        \begin{itemize}
+            \item demos and presentations
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Building and using debian packages}
+\begin{block}{}
+// build
+\begin{verbatim}
+    make BUILD_PROFILE=deb BASE_BUILD_ROFILE=reldebug
+\end{verbatim}
+\end{block}
+
+\begin{block}{}
+// install
+\begin{verbatim}
+    apt install ./artifacts/deb/ccws__reldebug__staging.deb
+\end{verbatim}
+\end{block}
+
+\begin{block}{}
+// use
+\begin{verbatim}
+    source /opt/ccws/ccws__reldebug__staging/ccws_setup.bash
+\end{verbatim}
+\end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Debian package metainformation}
+\begin{block}{}
+\begin{verbatim}
+    dpkg -I artifacts/deb/ccws__reldebug__staging.deb
+\end{verbatim}
+\end{block}
+\small{
+\begin{verbatim}
+ new Debian package, version 2.0.
+ size 3898618 bytes: control archive=728 bytes.
+     523 bytes,     7 lines      control
+     392 bytes,    13 lines   *  postinst             #!/bin/sh
+     173 bytes,     4 lines   *  postrm               #!/bin/sh
+     179 bytes,     4 lines   *  preinst              #!/bin/sh
+     343 bytes,    13 lines   *  prerm                #!/bin/sh
+ Package: ccws--reldebug--staging
+ Version: 20241023-2016-humble-3da1ff
+ Architecture: amd64
+ Maintainer: Alexander Sherikov <alexander@sherikov.net>
+ Description: ccws thread_supervisor ariles2_core_ws ...
+ Depends: cmake,libboost-all-dev,libeigen3-dev,libgtest-dev ...
+ Installed-Size: 8604
+\end{verbatim}
+}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Cross-compilation}
+
+\subsection{Overview}
+\begin{frame}{Overview}
+    \begin{block}{Approaches}
+        \begin{itemize}
+            \item (native $\times 10$) emulated compilation
+            \item (native $\times 1$) cross-compilation (does not work)
+            \item (native $\times 2$) mixed approach: \texttt{proot} + \texttt{qemu}
+        \end{itemize}
+    \end{block}
+
+    \begin{block}{Challenges}
+        \begin{itemize}
+            \item setting compiler is easy
+            \item reflect development and deployment root filesystems
+            \item absolute paths
+                \begin{itemize}
+                    \item in \texttt{cmake} files
+                    \item symbolic links in root filesystems
+                    \item broken shebangs
+                \end{itemize}
+            \item code generation, embedded scripts, custom compilers
+                \begin{itemize}
+                    \item \texttt{nvcc}, \texttt{protobuf}, \texttt{ROS} messages
+                    \item host vs target
+                \end{itemize}
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\subsection{Root filesystems}
+\begin{frame}{Obtaining root filesystems}
+    \begin{block}{Container-less}
+        \begin{itemize}
+            \item sources
+                \begin{itemize}
+                    \item download OS image (Raspberry Pi)
+                    \item generate image (NVidia Jetson)
+                    \item copy filesystem from the target
+                \end{itemize}
+            \item modifications and versioning
+        \end{itemize}
+    \end{block}
+
+    \begin{block}{Docker}
+        \begin{itemize}
+            \item export container image
+            \item modifications are difficult to reflect
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+
+\section{Performance}
+
+\begin{frame}[fragile]{Performance}
+    \begin{block}{\texttt{ccache}}
+        \begin{itemize}
+            \item compiler wrapper
+            \item object file cache
+            \item up to $\times30$ faster
+        \end{itemize}
+    \end{block}
+
+    \begin{block}{Measurements}
+        \vspace{3mm}
+        \begin{columns}[T]
+            \begin{column}{.3\textwidth}
+                clean build
+\begin{verbatim}
+real 1m3.947s
+user 1m22.861s
+sys  0m18.479s
+\end{verbatim}
+            \end{column}
+            \begin{column}{.3\textwidth}
+                rebuild
+\begin{verbatim}
+real 0m4.532s
+user 0m1.748s
+sys  0m3.050s
+\end{verbatim}
+$\times 14$ faster
+            \end{column}
+            \begin{column}{.3\textwidth}
+                clean \texttt{ccache} build
+\begin{verbatim}
+real 0m16.471s
+user 0m8.186s
+sys  0m9.140s
+\end{verbatim}
+$\times 4$ faster
+            \end{column}
+        \end{columns}
+    \end{block}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Final notes}
+
+\begin{frame}{Final notes}
+    \begin{block}{Smaller features}
+        \begin{itemize}
+            \item dependency graph generation
+            \item new package template
+            \item memory based selection of job number
+            \item selective testing
+            \item interlinked \texttt{doxygen} documentation
+            \item debian package linting
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{May be some day}
+
+\begin{frame}{May be some day}
+    \begin{block}{TODO}
+        \begin{itemize}
+            \item conceal data
+                \begin{itemize}
+                    \item stripping libraries and executables
+                    \item header files
+                    \item \texttt{dev} and \texttt{debug} packages
+                \end{itemize}
+            \item alternative containerization systems
+            \item \texttt{nix} or \texttt{guix}
+                \begin{itemize}
+                    \item gives control over all dependencies
+                    \item non-invasive packaging (manifests)
+                    \item channels, e.g., \url{https://github.com/asherikov/guix-sherikov}
+                \end{itemize}
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Conclusion}
+
+\begin{frame}
+
+    \centerline{Questions?}
+
+\end{frame}
+
+
+%\begin{frame}[plain,noframenumbering]
+%\end{frame}
+\end{document}
