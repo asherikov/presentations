@@ -1,0 +1,8 @@
+nodes:
+    - id: ["Workstation", workstation]
+    - id: ["Target", target]
+edges:
+    - link: [workstation, target]
+views:
+    - id: quickie
+      tags: ["default"]

@@ -1,0 +1,22 @@
+nodes:
+    - id: ["Workstation", workstation]
+    - id: ["Target", target]
+    - id: ["Infrastructure", infra]
+    - id: ["Buildfarm (Jenkins)", buildfarm]
+      scope: infra
+    - id: ["Private apt repository", private_repo]
+      scope: infra
+    - id: ["Ubuntu apt repository", ubuntu_repo]
+      scope: infra
+    - id: ["ROS apt repository", ros_repo]
+      scope: infra
+edges:
+    - link: [workstation, buildfarm]
+    - link: [buildfarm, private_repo]
+    - link: [ros_repo, private_repo]
+    - link: [ubuntu_repo, private_repo]
+    - link: [private_repo, target]
+    - link: [private_repo, workstation]
+views:
+    - id: buildfarm
+      tags: ["default"]

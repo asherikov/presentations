@@ -1,0 +1,16 @@
+nodes:
+    - id: ["Workstation", workstation]
+    - id: ["Target", target]
+    - id: ["Infrastructure", infra]
+    - id: ["Buildfarm (Jenkins)", buildfarm]
+      scope: infra
+    - id: ["ROS apt repository", ros_repo]
+      scope: infra
+edges:
+    - link: [workstation, buildfarm]
+    - link: [buildfarm, ros_repo]
+    - link: [ros_repo, target]
+    - link: [ros_repo, workstation]
+views:
+    - id: ros
+      tags: ["default"]

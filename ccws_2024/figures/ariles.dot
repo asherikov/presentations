@@ -1,0 +1,24 @@
+digraph graphname {
+  "ariles2_graphviz_ws";
+  "ariles2_core_ws";
+  "ariles2_ros2param_ws";
+  "ariles2_rapidjson_ws";
+  "ariles2_yamlcpp_ws";
+  "ariles2_pugixml_ws";
+  "ariles2_octave_ws";
+  "ariles2_rosparam_ws";
+  "ariles2_namevalue2_ws";
+  "ariles2_yamlcpp_ws" -> "ariles2_core_ws" [color="#0000ff:#ff0000"];
+  "ariles2_rosparam_ws" -> "ariles2_core_ws" [color="#0000ff:#ff0000"];
+  "ariles2_ros2param_ws" -> "ariles2_core_ws" [color="#0000ff:#ff0000"];
+  "ariles2_rapidjson_ws" -> "ariles2_core_ws" [color="#0000ff:#ff0000"];
+  "ariles2_pugixml_ws" -> "ariles2_core_ws" [color="#0000ff:#ff0000"];
+  "ariles2_octave_ws" -> "ariles2_core_ws" [color="#0000ff:#ff0000"];
+  "ariles2_namevalue2_ws" -> "ariles2_core_ws" [color="#0000ff:#ff0000"];
+  "ariles2_graphviz_ws" -> "ariles2_core_ws" [color="#0000ff:#ff0000"];
+
+  "ariles2_yamlcpp_ws" -> "ariles2_rosparam_ws" [style="invisible",arrowhead="none"];
+  "ariles2_ros2param_ws" -> "ariles2_rapidjson_ws" [style="invisible",arrowhead="none"];
+  "ariles2_pugixml_ws" -> "ariles2_octave_ws" [style="invisible",arrowhead="none"];
+  "ariles2_namevalue2_ws" -> "ariles2_graphviz_ws" [style="invisible",arrowhead="none"];
+}
